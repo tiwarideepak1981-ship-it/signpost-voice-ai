@@ -1,0 +1,25 @@
+{
+  "overview": "A comprehensive GenAI Voice Automation management dashboard for Signpost India. Covers inbound/outbound call management, lead CRM, campaign orchestration, analytics, billing, settings, and multi-channel communications (WhatsApp, SMS, Marketing) in a professional dark-themed B2B SaaS interface.",
+  "features": [
+    "Overview dashboard with key metrics, sparklines, and activity feed",
+    "Call Management with inbound/outbound/missed call logs, intent detection, and detail views",
+    "Lead CRM with Hot/Warm/Cold status, follow-up scheduling, and interaction timeline",
+    "Campaign Management with create, manage, and performance tracking",
+    "Analytics & Performance with call volume charts, conversion funnel, and agent stats",
+    "Billing & Usage with minute tracking, overage calculation at ₹5/min, and invoice history",
+    "Settings for business hours, bot scripts/intents, and agent routing rules",
+    "Multi-channel Communications panel with WhatsApp, SMS, and Marketing tabs"
+  ],
+  "category": "productivity",
+  "tags": [
+    "voice-automation",
+    "genai",
+    "crm",
+    "dashboard",
+    "b2b-saas",
+    "call-management",
+    "analytics",
+    "signpost-india"
+  ],
+  "last_updated": "2026-04-10T10:31:03.221Z"
+}
