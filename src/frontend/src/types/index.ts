@@ -36,6 +36,13 @@ export interface CallRecord {
   leadId?: string;
 }
 
+export interface LeadComment {
+  id: string;
+  text: string;
+  timestamp: string;
+  author: string;
+}
+
 export interface Lead {
   id: string;
   name: string;
@@ -86,6 +93,7 @@ export interface Lead {
   campaignLocation?: string;
   ehRegion?: LeadRegion;
   revenueDisplayAmount?: number;
+  comments?: LeadComment[];
 }
 
 export interface Campaign {

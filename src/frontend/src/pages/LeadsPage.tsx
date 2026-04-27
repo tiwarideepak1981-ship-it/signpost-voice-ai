@@ -15,7 +15,7 @@ import { agents, callRecords } from "@/data/sampleData";
 import { triggerLeadRouting } from "@/services/leadRoutingService";
 import { humanDialerStore } from "@/store/humanDialerStore";
 import { leadsStore } from "@/store/leadsStore";
-import type { Lead, LeadRegion, LeadStatus } from "@/types";
+import type { Lead, LeadComment, LeadRegion, LeadStatus } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
@@ -32,16 +32,18 @@ import {
   Flame,
   Mail,
   MapPin,
+  MessageSquare,
   Phone,
   RefreshCw,
   Search,
+  Send,
   Square,
   TrendingUp,
   User,
   Users,
   X,
 } from "lucide-react";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 20;
@@ -163,11 +165,187 @@ function StatCard({
   );
 }
 
+// ─── Detail Panel Section ─────────────────────────────────────────────────────
+function DetailSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="px-4 py-3 border-b border-border">
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number | boolean | undefined | null;
+}) {
+  if (value === undefined || value === null || value === "") return null;
+  const display =
+    typeof value === "boolean" ? (value ? "Yes" : "No") : String(value);
+  return (
+    <div className="flex items-start justify-between gap-2 py-0.5">
+      <span className="text-xs text-muted-foreground flex-shrink-0 w-36">
+        {label}
+      </span>
+      <span className="text-xs text-foreground text-right break-words max-w-44">
+        {display}
+      </span>
+    </div>
+  );
+}
+
 interface LeadDetailPanelProps {
   lead: Lead;
   onClose: () => void;
   onStatusChange: (id: string, status: LeadStatus) => void;
   onResendRouting: (lead: Lead) => void;
+}
+
+const FOLLOWUP_TEMPLATES = [
+  "Follow-up call made — no response, left voicemail.",
+  "Sent campaign proposal via email, awaiting response.",
+  "Connected on WhatsApp — shared media kit.",
+  "Meeting scheduled for next week.",
+  "Client requested revised proposal — will send by EOD.",
+  "Follow-up pending — client traveling.",
+];
+
+function formatCommentTimestamp(iso: string): string {
+  const d = new Date(iso);
+  const day = String(d.getDate()).padStart(2, "0");
+  const mon = d.toLocaleString("en-IN", { month: "short" });
+  const yr = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${day} ${mon} ${yr}, ${hh}:${mm}`;
+}
+
+function FollowUpComments({ lead }: { lead: Lead }) {
+  const [commentText, setCommentText] = useState("");
+  // Subscribe to live store so comments update immediately after save
+  const liveLeads = useSyncExternalStore(
+    leadsStore.subscribe,
+    leadsStore.getLeads,
+  );
+  const liveLead = liveLeads.find((l) => l.id === lead.id) ?? lead;
+
+  const handleTemplateClick = useCallback((tpl: string) => {
+    setCommentText(tpl);
+  }, []);
+
+  const handleSave = useCallback(() => {
+    const text = commentText.trim();
+    if (!text) return;
+    const comment: LeadComment = {
+      id: `cmt-${lead.id}-${Date.now()}`,
+      text,
+      timestamp: new Date().toISOString(),
+      author: "Agent",
+    };
+    leadsStore.addComment(lead.id, comment);
+    setCommentText("");
+  }, [commentText, lead.id]);
+
+  const comments = liveLead.comments ?? [];
+
+  return (
+    <div
+      className="px-4 py-3 border-b border-border"
+      data-ocid="followup-comments-section"
+    >
+      <div className="flex items-center gap-1.5 mb-2">
+        <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+          Follow-up Comments
+        </div>
+      </div>
+
+      {/* Template chips */}
+      <div className="flex flex-wrap gap-1 mb-2">
+        {FOLLOWUP_TEMPLATES.map((tpl) => (
+          <button
+            key={tpl}
+            type="button"
+            onClick={() => handleTemplateClick(tpl)}
+            className="text-xs px-2 py-0.5 rounded-full bg-muted/60 border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors truncate max-w-44"
+            title={tpl}
+            data-ocid="followup-template-chip"
+          >
+            {tpl.length > 28 ? `${tpl.slice(0, 26)}…` : tpl}
+          </button>
+        ))}
+      </div>
+
+      {/* Textarea */}
+      <textarea
+        value={commentText}
+        onChange={(e) => setCommentText(e.target.value)}
+        placeholder="Write a follow-up note..."
+        rows={3}
+        className="w-full bg-background border border-input rounded px-2.5 py-2 text-xs text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+        data-ocid="followup-comment-textarea"
+      />
+
+      <Button
+        type="button"
+        size="sm"
+        className="h-7 text-xs gap-1.5 mt-1.5 w-full"
+        disabled={!commentText.trim()}
+        onClick={handleSave}
+        data-ocid="followup-save-comment-btn"
+      >
+        <Send className="w-3 h-3" />
+        Save Comment
+      </Button>
+
+      {/* Comment log */}
+      <div className="mt-3">
+        {comments.length === 0 ? (
+          <div
+            className="text-xs text-muted-foreground text-center py-4 bg-muted/20 rounded"
+            data-ocid="followup-comments-empty-state"
+          >
+            No follow-up comments yet. Add your first note above.
+          </div>
+        ) : (
+          <div
+            className="space-y-2 max-h-48 overflow-y-auto pr-0.5"
+            data-ocid="followup-comments-list"
+          >
+            {comments.map((c) => (
+              <div
+                key={c.id}
+                className="bg-muted/30 border border-border/60 rounded p-2 space-y-1"
+              >
+                <p className="text-xs text-foreground leading-relaxed">
+                  {c.text}
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium text-primary">
+                    {c.author}
+                  </span>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {formatCommentTimestamp(c.timestamp)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function LeadDetailPanel({
@@ -242,10 +420,10 @@ function LeadDetailPanel({
             </div>
             <div className="min-w-0">
               <div className="text-sm font-semibold text-foreground truncate">
-                {lead.name}
+                {lead.clientContactPerson || lead.name}
               </div>
               <div className="text-xs text-muted-foreground">
-                {lead.company}
+                {lead.clientCompanyName || lead.company}
               </div>
             </div>
           </div>
@@ -261,27 +439,138 @@ function LeadDetailPanel({
 
         <div className="flex-1 overflow-y-auto">
           {/* Contact Info */}
-          <div className="px-4 py-3 border-b border-border space-y-2">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">
-              Contact Info
+          <DetailSection title="Contact Info">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-foreground">
+                <User className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <span className="font-medium">
+                  {lead.clientContactPerson || lead.name}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-foreground">
+                <Phone className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <span className="font-mono">
+                  {lead.clientMobileNumber || lead.phone}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-foreground">
+                <Mail className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">
+                  {lead.clientEmailId || lead.email}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-foreground">
+                <Building2 className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <span>{lead.clientCompanyName || lead.company}</span>
+              </div>
+              {lead.headOffice && (
+                <div className="flex items-center gap-2 text-xs text-foreground">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span>HO: {lead.headOffice}</span>
+                </div>
+              )}
             </div>
-            <div className="flex items-center gap-2 text-xs text-foreground">
-              <Phone className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-              <span className="font-mono">{lead.phone}</span>
+          </DetailSection>
+
+          {/* Lead Details */}
+          <DetailSection title="Lead Details">
+            <div className="space-y-0.5">
+              <DetailRow label="Source" value={lead.source} />
+              <DetailRow label="Channel" value={lead.channel} />
+              <DetailRow label="Category" value={lead.category} />
+              <DetailRow label="Type of Inquiry" value={lead.typeOfInquiry} />
+              <DetailRow
+                label="Enquiry Forwarded Through"
+                value={lead.enquiryForwardedThrough}
+              />
+              <DetailRow
+                label="Connected Status"
+                value={lead.connectedStatus}
+              />
+              <DetailRow label="Stage" value={lead.stage} />
             </div>
-            <div className="flex items-center gap-2 text-xs text-foreground">
-              <Mail className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{lead.email}</span>
+          </DetailSection>
+
+          {/* Requirements */}
+          <DetailSection title="Requirements">
+            {lead.requirements && (
+              <div className="bg-muted/30 rounded p-2 text-xs text-foreground mb-2 leading-relaxed">
+                {lead.requirements}
+              </div>
+            )}
+            <div className="space-y-0.5">
+              <DetailRow label="Duration" value={lead.duration} />
+              <DetailRow
+                label="Budget"
+                value={
+                  lead.budget
+                    ? `₹${lead.budget.toLocaleString("en-IN")}`
+                    : undefined
+                }
+              />
+              <DetailRow
+                label="Revenue (Display Amt)"
+                value={
+                  lead.revenueDisplayAmount
+                    ? `₹${lead.revenueDisplayAmount.toLocaleString("en-IN")}`
+                    : undefined
+                }
+              />
+              <DetailRow
+                label="Campaign Location"
+                value={lead.campaignLocation}
+              />
             </div>
-            <div className="flex items-center gap-2 text-xs text-foreground">
-              <Building2 className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-              <span>{lead.company}</span>
+          </DetailSection>
+
+          {/* Sales Info */}
+          <DetailSection title="Sales Info">
+            <div className="space-y-0.5">
+              <DetailRow label="Salesperson" value={lead.salesperson} />
+              <DetailRow
+                label="Reporting Manager"
+                value={lead.reportingManager}
+              />
+              <div className="flex items-start justify-between gap-2 py-0.5">
+                <span className="text-xs text-muted-foreground flex-shrink-0 w-36">
+                  Region
+                </span>
+                <span className="text-xs text-right">
+                  {lead.region && <RegionBadge region={lead.region} />}
+                </span>
+              </div>
+              {lead.ehRegion && (
+                <div className="flex items-start justify-between gap-2 py-0.5">
+                  <span className="text-xs text-muted-foreground flex-shrink-0 w-36">
+                    EH Region
+                  </span>
+                  <span className="text-xs text-right">
+                    <RegionBadge region={lead.ehRegion} />
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="flex items-center gap-2 text-xs text-foreground">
-              <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-              <span>{lead.location}</span>
+          </DetailSection>
+
+          {/* Notes & WhatsApp */}
+          <DetailSection title="Notes & Communication">
+            {lead.remarks && (
+              <div className="bg-muted/40 rounded p-2 text-xs text-foreground leading-relaxed mb-2">
+                {lead.remarks}
+              </div>
+            )}
+            <div className="space-y-0.5">
+              <DetailRow
+                label="Details via WhatsApp"
+                value={lead.detailsRequestedViaWhatsApp}
+              />
             </div>
-          </div>
+            {!lead.remarks && (
+              <div className="bg-muted/40 rounded p-2 text-xs text-foreground leading-relaxed">
+                {lead.notes}
+              </div>
+            )}
+          </DetailSection>
 
           {/* Lead Routing */}
           {lead.region && enterpriseHead && (
@@ -301,10 +590,6 @@ function LeadDetailPanel({
                 </span>
               </div>
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs text-muted-foreground">Region</span>
-                  <RegionBadge region={lead.region} />
-                </div>
                 <div className="bg-muted/30 border border-border rounded p-2.5 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
@@ -360,10 +645,10 @@ function LeadDetailPanel({
             </div>
           )}
 
-          {/* Status & Intent */}
+          {/* Status & Score */}
           <div className="px-4 py-3 border-b border-border">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">
-              Lead Info
+              Lead Score & Status
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -401,18 +686,6 @@ function LeadDetailPanel({
                   <span className="text-xs font-bold text-foreground flex-shrink-0">
                     {lead.score}
                   </span>
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Intent</div>
-                <div className="text-xs text-foreground font-medium">
-                  {lead.intent}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Source</div>
-                <div className="text-xs text-foreground truncate">
-                  {lead.campaignSource}
                 </div>
               </div>
             </div>
@@ -495,8 +768,11 @@ function LeadDetailPanel({
             )}
           </div>
 
+          {/* Follow-up Comments */}
+          <FollowUpComments lead={lead} />
+
           {/* Call History */}
-          <div className="px-4 py-3 border-b border-border">
+          <div className="px-4 py-3">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">
               Call History ({leadCalls.length || lead.callCount})
             </div>
@@ -531,11 +807,6 @@ function LeadDetailPanel({
                           {call.timestamp}
                         </span>
                       </div>
-                      {call.notes && (
-                        <div className="text-xs text-muted-foreground mt-0.5 italic">
-                          {call.notes}
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -568,16 +839,6 @@ function LeadDetailPanel({
               </div>
             )}
           </div>
-
-          {/* Notes */}
-          <div className="px-4 py-3">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">
-              Notes
-            </div>
-            <div className="bg-muted/40 rounded p-2 text-xs text-foreground leading-relaxed">
-              {lead.notes}
-            </div>
-          </div>
         </div>
 
         {/* Footer Actions */}
@@ -599,6 +860,55 @@ function LeadDetailPanel({
   );
 }
 
+// ─── Table column header ──────────────────────────────────────────────────────
+function TH({
+  children,
+  right,
+}: { children: React.ReactNode; right?: boolean }) {
+  return (
+    <th
+      className={`px-2 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap ${right ? "text-right" : "text-left"}`}
+    >
+      {children}
+    </th>
+  );
+}
+
+function TD({
+  children,
+  right,
+  className = "",
+}: {
+  children: React.ReactNode;
+  right?: boolean;
+  className?: string;
+}) {
+  return (
+    <td
+      className={`px-2 py-1.5 ${right ? "text-right" : "text-left"} ${className}`}
+    >
+      {children}
+    </td>
+  );
+}
+
+function CellText({
+  value,
+  mono,
+}: { value?: string | number | null; mono?: boolean }) {
+  if (!value && value !== 0)
+    return <span className="text-xs text-muted-foreground/40">—</span>;
+  return (
+    <span
+      className={`text-xs text-foreground truncate block max-w-28 ${mono ? "font-mono" : ""}`}
+      title={String(value)}
+    >
+      {String(value)}
+    </span>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function LeadsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -618,7 +928,6 @@ export default function LeadsPage() {
   const getLeadStatus = (lead: Lead): LeadStatus =>
     leadStatuses[lead.id] ?? lead.status;
 
-  // Summary stats
   const totalLeads = leads.length;
   const hotLeads = leads.filter((l) => getLeadStatus(l) === "hot").length;
   const today = new Date();
@@ -630,7 +939,6 @@ export default function LeadsPage() {
     (l) => getLeadStatus(l) === "converted",
   ).length;
 
-  // Filtered leads
   const filtered = useMemo(() => {
     return leads.filter((lead) => {
       const effectiveStatus = leadStatuses[lead.id] ?? lead.status;
@@ -638,8 +946,11 @@ export default function LeadsPage() {
       if (
         q &&
         !lead.name.toLowerCase().includes(q) &&
+        !(lead.clientContactPerson ?? "").toLowerCase().includes(q) &&
         !lead.phone.includes(q) &&
-        !lead.company.toLowerCase().includes(q)
+        !(lead.clientMobileNumber ?? "").includes(q) &&
+        !lead.company.toLowerCase().includes(q) &&
+        !(lead.clientCompanyName ?? "").toLowerCase().includes(q)
       )
         return false;
       if (statusFilter !== "all" && effectiveStatus !== statusFilter)
@@ -720,7 +1031,6 @@ export default function LeadsPage() {
       ...lead,
       routedAt: new Date().toISOString(),
     });
-    // Update detailLead with fresh routedAt
     setDetailLead(updated);
     toast.success(
       `Notification resent to ${updated.routedTo ?? "Enterprise Head"}`,
@@ -733,7 +1043,6 @@ export default function LeadsPage() {
     [leads],
   );
 
-  // Pagination display helper
   const pageNumbers = useMemo(() => {
     const pages: { key: string; value: number | "..." }[] = [];
     const allPages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -990,14 +1299,17 @@ export default function LeadsPage() {
           </div>
         )}
 
-        {/* Leads Table */}
+        {/* Leads Table — full 23-field horizontal scroll */}
         <div className="px-5 pb-4" data-ocid="leads-table-wrapper">
           <div className="border border-border rounded-md overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full data-table">
+              <table
+                className="w-full data-table"
+                style={{ minWidth: "2200px" }}
+              >
                 <thead>
                   <tr className="bg-muted/40 border-b border-border">
-                    <th className="px-3 py-2 text-left w-8">
+                    <th className="px-3 py-2 text-left w-8 sticky left-0 bg-muted/40 z-10">
                       <button
                         type="button"
                         onClick={toggleSelectAll}
@@ -1013,40 +1325,37 @@ export default function LeadsPage() {
                         )}
                       </button>
                     </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Phone
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
-                      Intent
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden xl:table-cell">
-                      Source
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
-                      Last Contact
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden xl:table-cell">
-                      Follow-up
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">
-                      Agent
-                    </th>
-                    <th className="px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
-                      Routing
-                    </th>
-                    <th className="px-2 py-2 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Action
-                    </th>
+                    {/* Lead status badge */}
+                    <TH>Status</TH>
+                    {/* 23 form fields in order */}
+                    <TH>Source</TH>
+                    <TH>Channel</TH>
+                    <TH>Client Contact Person</TH>
+                    <TH>Client Mobile Number</TH>
+                    <TH>Client Email ID</TH>
+                    <TH>Client Company Name</TH>
+                    <TH>Category</TH>
+                    <TH>Head Office</TH>
+                    <TH>Requirements</TH>
+                    <TH>Duration</TH>
+                    <TH>Budget</TH>
+                    <TH>Reporting Manager</TH>
+                    <TH>Salesperson</TH>
+                    <TH>Remarks</TH>
+                    <TH>Details via WhatsApp</TH>
+                    <TH>Enquiry Fwd Through</TH>
+                    <TH>Type of Inquiry</TH>
+                    <TH>Connected Status</TH>
+                    <TH>Stage</TH>
+                    <TH>Campaign Location</TH>
+                    <TH>Region</TH>
+                    <TH>EH Region</TH>
+                    <TH>Revenue (Display Amt)</TH>
+                    <TH right>Action</TH>
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((lead) => {
+                  {paginated.map((lead, rowIdx) => {
                     const effectiveStatus = getLeadStatus(lead);
                     const isSelected = selectedIds.has(lead.id);
                     return (
@@ -1059,9 +1368,9 @@ export default function LeadsPage() {
                         onKeyDown={(e) =>
                           e.key === "Enter" && setDetailLead(lead)
                         }
-                        data-ocid={`lead-row-${lead.id}`}
+                        data-ocid={`lead-row.item.${rowIdx + 1}`}
                       >
-                        <td className="px-3 py-2">
+                        <td className="px-3 py-1.5 sticky left-0 bg-card z-10">
                           <div
                             onClick={(e) => e.stopPropagation()}
                             onKeyDown={(e) => e.stopPropagation()}
@@ -1074,79 +1383,237 @@ export default function LeadsPage() {
                             />
                           </div>
                         </td>
-                        <td className="px-2 py-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 text-xs font-bold text-primary">
-                              {lead.name
+                        <TD>
+                          <LeadStatusBadge status={effectiveStatus} />
+                        </TD>
+                        {/* Source */}
+                        <TD>
+                          <CellText value={lead.source} />
+                        </TD>
+                        {/* Channel */}
+                        <TD>
+                          <CellText value={lead.channel} />
+                        </TD>
+                        {/* Client Contact Person */}
+                        <TD>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 text-xs font-bold text-primary">
+                              {(lead.clientContactPerson || lead.name)
                                 .split(" ")
                                 .map((n) => n[0])
                                 .join("")
                                 .slice(0, 2)}
                             </div>
-                            <div className="min-w-0">
-                              <div className="text-xs font-semibold text-foreground truncate max-w-28">
-                                {lead.name}
-                              </div>
-                              <div className="text-xs text-muted-foreground truncate max-w-28">
-                                {lead.company}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-2 py-2">
-                          <span className="text-xs font-mono text-foreground">
-                            {lead.phone}
-                          </span>
-                        </td>
-                        <td className="px-2 py-2">
-                          <LeadStatusBadge status={effectiveStatus} />
-                        </td>
-                        <td className="px-2 py-2 hidden lg:table-cell">
-                          <span className="text-xs text-foreground">
-                            {lead.intent}
-                          </span>
-                        </td>
-                        <td className="px-2 py-2 hidden xl:table-cell">
-                          <span className="text-xs text-muted-foreground truncate max-w-28 block">
-                            {lead.campaignSource}
-                          </span>
-                        </td>
-                        <td className="px-2 py-2 hidden lg:table-cell">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock className="w-3 h-3 flex-shrink-0" />
-                            <span className="truncate max-w-24">
-                              {lead.lastContact.split(" ")[0]}
+                            <span
+                              className="text-xs font-semibold text-foreground truncate max-w-28"
+                              title={lead.clientContactPerson || lead.name}
+                            >
+                              {lead.clientContactPerson || lead.name}
                             </span>
                           </div>
-                        </td>
-                        <td className="px-2 py-2 hidden xl:table-cell">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Calendar className="w-3 h-3 flex-shrink-0" />
-                            <span>{lead.followUpDate}</span>
-                          </div>
-                        </td>
-                        <td className="px-2 py-2 hidden md:table-cell">
-                          <span className="text-xs text-muted-foreground truncate max-w-24 block">
-                            {lead.assignedAgent.replace("GenAI Agent ", "")}
+                        </TD>
+                        {/* Client Mobile Number */}
+                        <TD>
+                          <CellText
+                            value={lead.clientMobileNumber || lead.phone}
+                            mono
+                          />
+                        </TD>
+                        {/* Client Email ID */}
+                        <TD>
+                          <span
+                            className="text-xs text-foreground truncate block max-w-36"
+                            title={lead.clientEmailId || lead.email}
+                          >
+                            {lead.clientEmailId || lead.email}
                           </span>
-                        </td>
-                        <td className="px-2 py-2 hidden lg:table-cell">
-                          {lead.region ? (
-                            <div className="flex flex-col gap-0.5">
-                              <RegionBadge region={lead.region} />
-                              {lead.routedTo && (
-                                <span className="text-xs text-muted-foreground truncate max-w-24 block">
-                                  {lead.routedTo.split(" ")[0]}
-                                </span>
-                              )}
-                            </div>
+                        </TD>
+                        {/* Client Company Name */}
+                        <TD>
+                          <span
+                            className="text-xs text-foreground truncate block max-w-28"
+                            title={lead.clientCompanyName || lead.company}
+                          >
+                            {lead.clientCompanyName || lead.company}
+                          </span>
+                        </TD>
+                        {/* Category */}
+                        <TD>
+                          <CellText value={lead.category} />
+                        </TD>
+                        {/* Head Office */}
+                        <TD>
+                          <CellText value={lead.headOffice} />
+                        </TD>
+                        {/* Requirements */}
+                        <TD>
+                          {lead.requirements ? (
+                            <span
+                              className="text-xs text-foreground truncate block max-w-36"
+                              title={lead.requirements}
+                            >
+                              {lead.requirements.length > 30
+                                ? `${lead.requirements.slice(0, 30)}…`
+                                : lead.requirements}
+                            </span>
                           ) : (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-xs text-muted-foreground/40">
                               —
                             </span>
                           )}
-                        </td>
-                        <td className="px-2 py-2 text-right">
+                        </TD>
+                        {/* Duration */}
+                        <TD>
+                          <CellText value={lead.duration} />
+                        </TD>
+                        {/* Budget */}
+                        <TD>
+                          {lead.budget ? (
+                            <span className="text-xs text-foreground font-mono">
+                              ₹{lead.budget.toLocaleString("en-IN")}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Reporting Manager */}
+                        <TD>
+                          <CellText value={lead.reportingManager} />
+                        </TD>
+                        {/* Salesperson */}
+                        <TD>
+                          <CellText value={lead.salesperson} />
+                        </TD>
+                        {/* Remarks */}
+                        <TD>
+                          {lead.remarks ? (
+                            <span
+                              className="text-xs text-foreground truncate block max-w-36"
+                              title={lead.remarks}
+                            >
+                              {lead.remarks.length > 28
+                                ? `${lead.remarks.slice(0, 28)}…`
+                                : lead.remarks}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Details via WhatsApp */}
+                        <TD>
+                          {lead.detailsRequestedViaWhatsApp !== undefined ? (
+                            <span
+                              className={`text-xs font-medium ${
+                                lead.detailsRequestedViaWhatsApp
+                                  ? "text-emerald-400"
+                                  : "text-muted-foreground"
+                              }`}
+                            >
+                              {lead.detailsRequestedViaWhatsApp ? "Yes" : "No"}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Enquiry Forwarded Through */}
+                        <TD>
+                          <CellText value={lead.enquiryForwardedThrough} />
+                        </TD>
+                        {/* Type of Inquiry */}
+                        <TD>
+                          <CellText value={lead.typeOfInquiry} />
+                        </TD>
+                        {/* Connected Status */}
+                        <TD>
+                          {lead.connectedStatus ? (
+                            <span
+                              className={`text-xs font-medium ${
+                                lead.connectedStatus === "Connected"
+                                  ? "text-emerald-400"
+                                  : lead.connectedStatus === "In Discussion"
+                                    ? "text-amber-400"
+                                    : "text-muted-foreground"
+                              }`}
+                            >
+                              {lead.connectedStatus}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Stage */}
+                        <TD>
+                          {lead.stage ? (
+                            <span
+                              className={`text-xs font-medium px-1.5 py-0.5 rounded ${
+                                lead.stage === "Closed Won"
+                                  ? "bg-emerald-500/15 text-emerald-400"
+                                  : lead.stage === "Closed Lost"
+                                    ? "bg-muted text-muted-foreground"
+                                    : lead.stage === "Negotiation"
+                                      ? "bg-amber-500/15 text-amber-400"
+                                      : lead.stage === "Proposal Sent"
+                                        ? "bg-blue-500/15 text-blue-400"
+                                        : "bg-muted/50 text-foreground"
+                              }`}
+                            >
+                              {lead.stage}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Campaign Location */}
+                        <TD>
+                          <CellText value={lead.campaignLocation} />
+                        </TD>
+                        {/* Region */}
+                        <TD>
+                          {lead.region ? (
+                            <RegionBadge region={lead.region} />
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* EH Region */}
+                        <TD>
+                          {lead.ehRegion ? (
+                            <RegionBadge region={lead.ehRegion} />
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Revenue Display Amount */}
+                        <TD>
+                          {lead.revenueDisplayAmount ? (
+                            <span className="text-xs text-foreground font-mono">
+                              ₹
+                              {lead.revenueDisplayAmount.toLocaleString(
+                                "en-IN",
+                              )}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground/40">
+                              —
+                            </span>
+                          )}
+                        </TD>
+                        {/* Action */}
+                        <td className="px-2 py-1.5 text-right">
                           <div
                             className="flex items-center justify-end gap-1"
                             onClick={(e) => e.stopPropagation()}
@@ -1154,14 +1621,16 @@ export default function LeadsPage() {
                           >
                             <button
                               type="button"
-                              title={`Call ${lead.name}`}
+                              title={`Call ${lead.clientContactPerson || lead.name}`}
                               onClick={() => {
                                 humanDialerStore
                                   .getState()
                                   .setClickToCallTargetObj({
-                                    name: lead.name,
-                                    phone: lead.phone,
-                                    company: lead.company,
+                                    name: lead.clientContactPerson || lead.name,
+                                    phone:
+                                      lead.clientMobileNumber || lead.phone,
+                                    company:
+                                      lead.clientCompanyName || lead.company,
                                   });
                                 navigate({ to: "/human-dialer" });
                               }}
@@ -1187,7 +1656,7 @@ export default function LeadsPage() {
                   })}
                   {paginated.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="py-12 text-center">
+                      <td colSpan={26} className="py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <Search className="w-8 h-8 text-muted-foreground/40" />
                           <div className="text-sm font-medium text-muted-foreground">

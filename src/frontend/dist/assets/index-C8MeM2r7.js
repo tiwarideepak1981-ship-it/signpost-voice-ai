@@ -29012,6 +29012,157 @@ const leadStatuses = [
   "converted",
   "lost"
 ];
+const sources = [
+  "Inbound Call",
+  "Outbound Call",
+  "WhatsApp",
+  "Email",
+  "Referral",
+  "LinkedIn",
+  "Website"
+];
+const channels = ["Direct", "Agency", "Partner", "Digital", "Cold Call"];
+const categories = [
+  "Transit",
+  "Billboard",
+  "Airport",
+  "Mall",
+  "Cinema",
+  "Street Furniture",
+  "Digital OOH"
+];
+const headOffices = [
+  "Mumbai",
+  "Delhi",
+  "Bangalore",
+  "Chennai",
+  "Kolkata",
+  "Hyderabad",
+  "Pune"
+];
+const requirementsList = [
+  "10 screens in Mumbai metro stations for 2 weeks",
+  "Billboard placement on NH-48 corridor for 1 month",
+  "Airport digital screens at T2 terminal, all faces",
+  "Mall atrium takeover in Phoenix Palladium for 3 weeks",
+  "Transit media on BEST buses in Western Mumbai",
+  "Cinema lobby screens pre-movie slots across multiplex chain",
+  "Street furniture panels near IT parks in Bangalore",
+  "Digital OOH screens at major junctions in Delhi NCR",
+  "Premium billboard on Marine Drive facing sea",
+  "Bus shelter advertising in Pune city limits",
+  "Metro pillar branding for product launch campaign",
+  "Airport baggage belt branding for brand visibility"
+];
+const campaignDurations = [
+  "2 weeks",
+  "1 month",
+  "3 months",
+  "6 months",
+  "1 year",
+  "45 days",
+  "2 months"
+];
+const budgets = [
+  5e5,
+  1e6,
+  25e5,
+  5e6,
+  1e7,
+  2e6,
+  75e4,
+  15e5,
+  3e6,
+  8e5
+];
+const reportingManagers = [
+  "Anand Krishnamurthy",
+  "Sunita Reddy",
+  "Rajiv Malhotra",
+  "Preethi Nambiar",
+  "Sanjiv Kapoor",
+  "Meenakshi Iyer",
+  "Harsh Vardhan"
+];
+const salespersons = [
+  "Rohan Desai",
+  "Pooja Mehta",
+  "Kartik Sharma",
+  "Divya Nair",
+  "Arpit Joshi",
+  "Shreya Pillai",
+  "Aakash Singh"
+];
+const remarksList = [
+  "Interested in premium inventory. Needs rate card.",
+  "Visited office for demo. High-intent client.",
+  "Requesting case studies from similar industry.",
+  "Budget approved. Awaiting final brief.",
+  "Decision expected by end of month.",
+  "Needs approval from marketing head.",
+  "Very responsive. Strong potential.",
+  "Called twice. Follow-up scheduled.",
+  "Competition also pitching. Price-sensitive.",
+  "Confirmed interest. Proposal stage."
+];
+const enquiryForwardedThroughOptions = [
+  "Direct",
+  "Partner",
+  "Agency",
+  "LinkedIn",
+  "Referral",
+  "Email Campaign"
+];
+const typeOfInquiryOptions = [
+  "New Campaign",
+  "Renewal",
+  "Expansion",
+  "Price Inquiry",
+  "Proposal Request"
+];
+const connectedStatusOptions = [
+  "Connected",
+  "Not Connected",
+  "Callback Requested",
+  "In Discussion"
+];
+const stageOptions = [
+  "New",
+  "Qualified",
+  "Proposal Sent",
+  "Negotiation",
+  "Closed Won",
+  "Closed Lost"
+];
+const campaignLocationsList = [
+  "Mumbai",
+  "Delhi NCR",
+  "Bangalore",
+  "Chennai",
+  "Kolkata",
+  "Hyderabad",
+  "Pune",
+  "Ahmedabad",
+  "Jaipur",
+  "Lucknow"
+];
+const revenueAmounts = [
+  85e4,
+  12e5,
+  45e5,
+  28e5,
+  65e4,
+  18e5,
+  32e5,
+  9e5,
+  55e5,
+  11e5,
+  75e4,
+  22e5,
+  4e6,
+  16e5,
+  7e5
+];
 const leads = Array.from({ length: 85 }, (_, i) => {
   const fn = firstNames[i % firstNames.length];
   const ln2 = lastNames[i % lastNames.length];
@@ -29024,11 +29175,14 @@ const leads = Array.from({ length: 85 }, (_, i) => {
   const role = leadRoles[i % leadRoles.length];
   const company = companies[i % companies.length];
   const location2 = locations[i % locations.length];
+  const contactName = `${fn} ${ln2}`;
+  const contactPhone = `+91-9${String(8e8 + i * 1234).slice(0, 9)}`;
+  const contactEmail = `${fn.toLowerCase()}.${ln2.toLowerCase()}@${company.toLowerCase().replace(/[\s&]/g, "").replace(/\./g, "")}.com`;
   const partialLead = {
     id: `lead-${i + 1}`,
-    name: `${fn} ${ln2}`,
-    phone: `+91-9${String(8e8 + i * 1234).slice(0, 9)}`,
-    email: `${fn.toLowerCase()}.${ln2.toLowerCase()}@${company.toLowerCase().replace(/[\s&]/g, "").replace(/\./g, "")}.com`,
+    name: contactName,
+    phone: contactPhone,
+    email: contactEmail,
     company,
     status: leadStatuses[statusIdx],
     intent: intents[i % intents.length],
@@ -29039,7 +29193,29 @@ const leads = Array.from({ length: 85 }, (_, i) => {
     campaignSource: campaigns[campIdx].name,
     notes: i % 4 === 0 ? `${role} — keen on Q3 media planning proposal` : i % 6 === 0 ? "Requested agency credentials deck" : "Needs follow-up on campaign brief",
     callCount: 1 + i % 6,
-    location: location2
+    location: location2,
+    // ─── 23 custom form fields ──────────────────────────────────────────────
+    source: sources[i % sources.length],
+    channel: channels[i % channels.length],
+    clientContactPerson: contactName,
+    clientMobileNumber: contactPhone,
+    clientEmailId: contactEmail,
+    clientCompanyName: company,
+    category: categories[i % categories.length],
+    headOffice: headOffices[i % headOffices.length],
+    requirements: requirementsList[i % requirementsList.length],
+    duration: campaignDurations[i % campaignDurations.length],
+    budget: budgets[i % budgets.length],
+    reportingManager: reportingManagers[i % reportingManagers.length],
+    salesperson: salespersons[i % salespersons.length],
+    remarks: remarksList[i % remarksList.length],
+    detailsRequestedViaWhatsApp: i % 3 === 0,
+    enquiryForwardedThrough: enquiryForwardedThroughOptions[i % enquiryForwardedThroughOptions.length],
+    typeOfInquiry: typeOfInquiryOptions[i % typeOfInquiryOptions.length],
+    connectedStatus: connectedStatusOptions[i % connectedStatusOptions.length],
+    stage: stageOptions[i % stageOptions.length],
+    campaignLocation: campaignLocationsList[i % campaignLocationsList.length],
+    revenueDisplayAmount: revenueAmounts[i % revenueAmounts.length]
   };
   const region = detectRegion(partialLead);
   const headNames = {
@@ -29054,9 +29230,44 @@ const leads = Array.from({ length: 85 }, (_, i) => {
   return {
     ...partialLead,
     region,
+    ehRegion: region,
     routedTo: headNames[region] ?? "Vikram Mehta",
     routedAt: "2025-01-10T09:00:00Z",
-    routingStatus: "sent"
+    routingStatus: "sent",
+    comments: i === 0 ? [
+      {
+        id: "cmt-1-2",
+        text: "Client requested revised proposal — will send by EOD.",
+        timestamp: "2024-04-15T14:30:00Z",
+        author: "Agent"
+      },
+      {
+        id: "cmt-1-1",
+        text: "Connected on WhatsApp — shared media kit.",
+        timestamp: "2024-04-12T11:00:00Z",
+        author: "Agent"
+      }
+    ] : i === 2 ? [
+      {
+        id: "cmt-3-1",
+        text: "Sent campaign proposal via email, awaiting response.",
+        timestamp: "2024-04-10T09:45:00Z",
+        author: "Agent"
+      }
+    ] : i === 4 ? [
+      {
+        id: "cmt-5-2",
+        text: "Meeting scheduled for next week.",
+        timestamp: "2024-04-14T16:00:00Z",
+        author: "Agent"
+      },
+      {
+        id: "cmt-5-1",
+        text: "Follow-up call made — no response, left voicemail.",
+        timestamp: "2024-04-09T10:30:00Z",
+        author: "Agent"
+      }
+    ] : void 0
   };
 });
 const billingOverview = {
@@ -31223,7 +31434,22 @@ const sampleWhatsAppAIThreads = [
   }
 ];
 const listeners$1 = /* @__PURE__ */ new Set();
-let _leads = [...leads];
+const STORAGE_KEY$1 = "signpost_leads_v1";
+function loadFromStorage$1() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY$1);
+    if (raw) return JSON.parse(raw);
+  } catch {
+  }
+  return [...leads];
+}
+function saveToStorage$1(leads2) {
+  try {
+    localStorage.setItem(STORAGE_KEY$1, JSON.stringify(leads2));
+  } catch {
+  }
+}
+let _leads = loadFromStorage$1();
 function notifyAll$2() {
   for (const fn of listeners$1) fn();
 }
@@ -31234,6 +31460,18 @@ const leadsStore = {
   addLeads(newLeads) {
     const routed = newLeads.map((lead) => triggerLeadRouting(lead));
     _leads = [..._leads, ...routed];
+    saveToStorage$1(_leads);
+    notifyAll$2();
+  },
+  addComment(leadId, comment) {
+    _leads = _leads.map((lead) => {
+      if (lead.id !== leadId) return lead;
+      return {
+        ...lead,
+        comments: [comment, ...lead.comments ?? []]
+      };
+    });
+    saveToStorage$1(_leads);
     notifyAll$2();
   },
   subscribe(listener) {
@@ -47096,8 +47334,8 @@ var named = {
   yellowgreen: 10145074
 };
 define(Color, color, {
-  copy(channels) {
-    return Object.assign(new this.constructor(), this, channels);
+  copy(channels2) {
+    return Object.assign(new this.constructor(), this, channels2);
   },
   displayable() {
     return this.rgb().displayable();
@@ -79996,6 +80234,146 @@ function StatCard({
     ] })
   ] });
 }
+function DetailSection({
+  title,
+  children
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 border-b border-border", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2", children: title }),
+    children
+  ] });
+}
+function DetailRow({
+  label,
+  value
+}) {
+  if (value === void 0 || value === null || value === "") return null;
+  const display = typeof value === "boolean" ? value ? "Yes" : "No" : String(value);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 py-0.5", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground flex-shrink-0 w-36", children: label }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-foreground text-right break-words max-w-44", children: display })
+  ] });
+}
+const FOLLOWUP_TEMPLATES = [
+  "Follow-up call made — no response, left voicemail.",
+  "Sent campaign proposal via email, awaiting response.",
+  "Connected on WhatsApp — shared media kit.",
+  "Meeting scheduled for next week.",
+  "Client requested revised proposal — will send by EOD.",
+  "Follow-up pending — client traveling."
+];
+function formatCommentTimestamp(iso) {
+  const d2 = new Date(iso);
+  const day = String(d2.getDate()).padStart(2, "0");
+  const mon = d2.toLocaleString("en-IN", { month: "short" });
+  const yr = d2.getFullYear();
+  const hh = String(d2.getHours()).padStart(2, "0");
+  const mm = String(d2.getMinutes()).padStart(2, "0");
+  return `${day} ${mon} ${yr}, ${hh}:${mm}`;
+}
+function FollowUpComments({ lead }) {
+  const [commentText, setCommentText] = reactExports.useState("");
+  const liveLeads = reactExports.useSyncExternalStore(
+    leadsStore.subscribe,
+    leadsStore.getLeads
+  );
+  const liveLead = liveLeads.find((l2) => l2.id === lead.id) ?? lead;
+  const handleTemplateClick = reactExports.useCallback((tpl) => {
+    setCommentText(tpl);
+  }, []);
+  const handleSave = reactExports.useCallback(() => {
+    const text = commentText.trim();
+    if (!text) return;
+    const comment = {
+      id: `cmt-${lead.id}-${Date.now()}`,
+      text,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      author: "Agent"
+    };
+    leadsStore.addComment(lead.id, comment);
+    setCommentText("");
+  }, [commentText, lead.id]);
+  const comments = liveLead.comments ?? [];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      className: "px-4 py-3 border-b border-border",
+      "data-ocid": "followup-comments-section",
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5 mb-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "w-3.5 h-3.5 text-muted-foreground" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest", children: "Follow-up Comments" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-1 mb-2", children: FOLLOWUP_TEMPLATES.map((tpl) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: () => handleTemplateClick(tpl),
+            className: "text-xs px-2 py-0.5 rounded-full bg-muted/60 border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors truncate max-w-44",
+            title: tpl,
+            "data-ocid": "followup-template-chip",
+            children: tpl.length > 28 ? `${tpl.slice(0, 26)}…` : tpl
+          },
+          tpl
+        )) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            value: commentText,
+            onChange: (e3) => setCommentText(e3.target.value),
+            placeholder: "Write a follow-up note...",
+            rows: 3,
+            className: "w-full bg-background border border-input rounded px-2.5 py-2 text-xs text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring",
+            "data-ocid": "followup-comment-textarea"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            type: "button",
+            size: "sm",
+            className: "h-7 text-xs gap-1.5 mt-1.5 w-full",
+            disabled: !commentText.trim(),
+            onClick: handleSave,
+            "data-ocid": "followup-save-comment-btn",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-3 h-3" }),
+              "Save Comment"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3", children: comments.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "text-xs text-muted-foreground text-center py-4 bg-muted/20 rounded",
+            "data-ocid": "followup-comments-empty-state",
+            children: "No follow-up comments yet. Add your first note above."
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "space-y-2 max-h-48 overflow-y-auto pr-0.5",
+            "data-ocid": "followup-comments-list",
+            children: comments.map((c2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "bg-muted/30 border border-border/60 rounded p-2 space-y-1",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-foreground leading-relaxed", children: c2.text }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-primary", children: c2.author }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground font-mono", children: formatCommentTimestamp(c2.timestamp) })
+                  ] })
+                ]
+              },
+              c2.id
+            ))
+          }
+        ) })
+      ]
+    }
+  );
+}
 function LeadDetailPanel({
   lead,
   onClose,
@@ -80051,8 +80429,8 @@ function LeadDetailPanel({
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-primary", children: lead.name.split(" ").map((n2) => n2[0]).join("").slice(0, 2) }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-semibold text-foreground truncate", children: lead.name }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground", children: lead.company })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-semibold text-foreground truncate", children: lead.clientContactPerson || lead.name }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground", children: lead.clientCompanyName || lead.company })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -80067,24 +80445,107 @@ function LeadDetailPanel({
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 border-b border-border space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2", children: "Contact Info" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DetailSection, { title: "Contact Info", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-xs text-foreground", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3.5 h-3.5 text-muted-foreground flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: lead.clientContactPerson || lead.name })
+              ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-xs text-foreground", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3.5 h-3.5 text-muted-foreground flex-shrink-0" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono", children: lead.phone })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono", children: lead.clientMobileNumber || lead.phone })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-xs text-foreground", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3.5 h-3.5 text-muted-foreground flex-shrink-0" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: lead.email })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: lead.clientEmailId || lead.email })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-xs text-foreground", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Building2, { className: "w-3.5 h-3.5 text-muted-foreground flex-shrink-0" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: lead.company })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: lead.clientCompanyName || lead.company })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-xs text-foreground", children: [
+              lead.headOffice && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-xs text-foreground", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5 text-muted-foreground flex-shrink-0" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: lead.location })
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                  "HO: ",
+                  lead.headOffice
+                ] })
               ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DetailSection, { title: "Lead Details", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-0.5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Source", value: lead.source }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Channel", value: lead.channel }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Category", value: lead.category }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Type of Inquiry", value: lead.typeOfInquiry }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                DetailRow,
+                {
+                  label: "Enquiry Forwarded Through",
+                  value: lead.enquiryForwardedThrough
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                DetailRow,
+                {
+                  label: "Connected Status",
+                  value: lead.connectedStatus
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Stage", value: lead.stage })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(DetailSection, { title: "Requirements", children: [
+              lead.requirements && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-muted/30 rounded p-2 text-xs text-foreground mb-2 leading-relaxed", children: lead.requirements }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-0.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Duration", value: lead.duration }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  DetailRow,
+                  {
+                    label: "Budget",
+                    value: lead.budget ? `₹${lead.budget.toLocaleString("en-IN")}` : void 0
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  DetailRow,
+                  {
+                    label: "Revenue (Display Amt)",
+                    value: lead.revenueDisplayAmount ? `₹${lead.revenueDisplayAmount.toLocaleString("en-IN")}` : void 0
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  DetailRow,
+                  {
+                    label: "Campaign Location",
+                    value: lead.campaignLocation
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DetailSection, { title: "Sales Info", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-0.5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(DetailRow, { label: "Salesperson", value: lead.salesperson }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                DetailRow,
+                {
+                  label: "Reporting Manager",
+                  value: lead.reportingManager
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 py-0.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground flex-shrink-0 w-36", children: "Region" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-right", children: lead.region && /* @__PURE__ */ jsxRuntimeExports.jsx(RegionBadge, { region: lead.region }) })
+              ] }),
+              lead.ehRegion && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2 py-0.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground flex-shrink-0 w-36", children: "EH Region" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RegionBadge, { region: lead.ehRegion }) })
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(DetailSection, { title: "Notes & Communication", children: [
+              lead.remarks && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-muted/40 rounded p-2 text-xs text-foreground leading-relaxed mb-2", children: lead.remarks }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-0.5", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                DetailRow,
+                {
+                  label: "Details via WhatsApp",
+                  value: lead.detailsRequestedViaWhatsApp
+                }
+              ) }),
+              !lead.remarks && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-muted/40 rounded p-2 text-xs text-foreground leading-relaxed", children: lead.notes })
             ] }),
             lead.region && enterpriseHead && /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
@@ -80104,10 +80565,6 @@ function LeadDetailPanel({
                     )
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2.5", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: "Region" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(RegionBadge, { region: lead.region })
-                    ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-muted/30 border border-border rounded p-2.5 space-y-1.5", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3.5 h-3.5 text-primary" }) }),
@@ -80159,7 +80616,7 @@ function LeadDetailPanel({
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 border-b border-border", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2", children: "Lead Info" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2", children: "Lead Score & Status" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground mb-1", children: "Status" }),
@@ -80194,14 +80651,6 @@ function LeadDetailPanel({
                     ) }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-foreground flex-shrink-0", children: lead.score })
                   ] })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground mb-1", children: "Intent" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-foreground font-medium", children: lead.intent })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground mb-1", children: "Source" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-foreground truncate", children: lead.campaignSource })
                 ] })
               ] })
             ] }),
@@ -80276,7 +80725,8 @@ function LeadDetailPanel({
                 )
               ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 border-b border-border", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(FollowUpComments, { lead }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2", children: [
                 "Call History (",
                 leadCalls.length || lead.callCount,
@@ -80301,8 +80751,7 @@ function LeadDetailPanel({
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mt-0.5", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3 h-3 text-muted-foreground" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: call.timestamp })
-                      ] }),
-                      call.notes && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground mt-0.5 italic", children: call.notes })
+                      ] })
                     ] })
                   ]
                 },
@@ -80329,10 +80778,6 @@ function LeadDetailPanel({
                   `${lead.id}-call-${i + 1}`
                 )
               ) })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2", children: "Notes" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-muted/40 rounded p-2 text-xs text-foreground leading-relaxed", children: lead.notes })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 border-t border-border bg-card flex gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -80352,6 +80797,46 @@ function LeadDetailPanel({
           ) })
         ] })
       ]
+    }
+  );
+}
+function TH({
+  children,
+  right
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "th",
+    {
+      className: `px-2 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap ${right ? "text-right" : "text-left"}`,
+      children
+    }
+  );
+}
+function TD({
+  children,
+  right,
+  className = ""
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "td",
+    {
+      className: `px-2 py-1.5 ${right ? "text-right" : "text-left"} ${className}`,
+      children
+    }
+  );
+}
+function CellText({
+  value,
+  mono
+}) {
+  if (!value && value !== 0)
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "span",
+    {
+      className: `text-xs text-foreground truncate block max-w-28 ${mono ? "font-mono" : ""}`,
+      title: String(value),
+      children: String(value)
     }
   );
 }
@@ -80385,7 +80870,7 @@ function LeadsPage() {
     return leads2.filter((lead) => {
       const effectiveStatus = leadStatuses2[lead.id] ?? lead.status;
       const q2 = search.toLowerCase();
-      if (q2 && !lead.name.toLowerCase().includes(q2) && !lead.phone.includes(q2) && !lead.company.toLowerCase().includes(q2))
+      if (q2 && !lead.name.toLowerCase().includes(q2) && !(lead.clientContactPerson ?? "").toLowerCase().includes(q2) && !lead.phone.includes(q2) && !(lead.clientMobileNumber ?? "").includes(q2) && !lead.company.toLowerCase().includes(q2) && !(lead.clientCompanyName ?? "").toLowerCase().includes(q2))
         return false;
       if (statusFilter !== "all" && effectiveStatus !== statusFilter)
         return false;
@@ -80729,149 +81214,241 @@ function LeadsPage() {
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-5 pb-4", "data-ocid": "leads-table-wrapper", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-border rounded-md overflow-hidden", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full data-table", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "bg-muted/40 border-b border-border", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left w-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                type: "button",
-                onClick: toggleSelectAll,
-                className: "text-muted-foreground hover:text-foreground",
-                "aria-label": "Select all",
-                "data-ocid": "select-all-checkbox",
-                children: selectedIds.size === paginated.length && paginated.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(SquareCheckBig, { className: "w-3.5 h-3.5 text-primary" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Square, { className: "w-3.5 h-3.5" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider", children: "Name" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider", children: "Phone" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider", children: "Status" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell", children: "Intent" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden xl:table-cell", children: "Source" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell", children: "Last Contact" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden xl:table-cell", children: "Follow-up" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell", children: "Agent" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell", children: "Routing" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-2 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider", children: "Action" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { children: [
-            paginated.map((lead) => {
-              const effectiveStatus = getLeadStatus(lead);
-              const isSelected = selectedIds.has(lead.id);
-              return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "tr",
-                {
-                  className: `border-b border-border transition-colors cursor-pointer hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`,
-                  onClick: () => setDetailLead(lead),
-                  onKeyDown: (e3) => e3.key === "Enter" && setDetailLead(lead),
-                  "data-ocid": `lead-row-${lead.id}`,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "div",
-                      {
-                        onClick: (e3) => e3.stopPropagation(),
-                        onKeyDown: (e3) => e3.stopPropagation(),
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Checkbox,
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "table",
+          {
+            className: "w-full data-table",
+            style: { minWidth: "2200px" },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "bg-muted/40 border-b border-border", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left w-8 sticky left-0 bg-muted/40 z-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: toggleSelectAll,
+                    className: "text-muted-foreground hover:text-foreground",
+                    "aria-label": "Select all",
+                    "data-ocid": "select-all-checkbox",
+                    children: selectedIds.size === paginated.length && paginated.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(SquareCheckBig, { className: "w-3.5 h-3.5 text-primary" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Square, { className: "w-3.5 h-3.5" })
+                  }
+                ) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Status" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Source" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Channel" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Client Contact Person" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Client Mobile Number" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Client Email ID" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Client Company Name" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Category" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Head Office" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Requirements" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Duration" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Budget" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Reporting Manager" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Salesperson" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Remarks" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Details via WhatsApp" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Enquiry Fwd Through" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Type of Inquiry" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Connected Status" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Stage" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Campaign Location" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Region" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "EH Region" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { children: "Revenue (Display Amt)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TH, { right: true, children: "Action" })
+              ] }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { children: [
+                paginated.map((lead, rowIdx) => {
+                  const effectiveStatus = getLeadStatus(lead);
+                  const isSelected = selectedIds.has(lead.id);
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "tr",
+                    {
+                      className: `border-b border-border transition-colors cursor-pointer hover:bg-muted/30 ${isSelected ? "bg-primary/5" : ""}`,
+                      onClick: () => setDetailLead(lead),
+                      onKeyDown: (e3) => e3.key === "Enter" && setDetailLead(lead),
+                      "data-ocid": `lead-row.item.${rowIdx + 1}`,
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-1.5 sticky left-0 bg-card z-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "div",
                           {
-                            checked: isSelected,
-                            onCheckedChange: () => toggleSelect(lead.id),
-                            className: "w-3.5 h-3.5",
-                            "data-ocid": `lead-checkbox-${lead.id}`
+                            onClick: (e3) => e3.stopPropagation(),
+                            onKeyDown: (e3) => e3.stopPropagation(),
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              Checkbox,
+                              {
+                                checked: isSelected,
+                                onCheckedChange: () => toggleSelect(lead.id),
+                                className: "w-3.5 h-3.5",
+                                "data-ocid": `lead-checkbox-${lead.id}`
+                              }
+                            )
                           }
-                        )
-                      }
-                    ) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-6 h-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 text-xs font-bold text-primary", children: lead.name.split(" ").map((n2) => n2[0]).join("").slice(0, 2) }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-foreground truncate max-w-28", children: lead.name }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground truncate max-w-28", children: lead.company })
-                      ] })
-                    ] }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-mono text-foreground", children: lead.phone }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LeadStatusBadge, { status: effectiveStatus }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 hidden lg:table-cell", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-foreground", children: lead.intent }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 hidden xl:table-cell", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground truncate max-w-28 block", children: lead.campaignSource }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 hidden lg:table-cell", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3 h-3 flex-shrink-0" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-24", children: lead.lastContact.split(" ")[0] })
-                    ] }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 hidden xl:table-cell", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "w-3 h-3 flex-shrink-0" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: lead.followUpDate })
-                    ] }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 hidden md:table-cell", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground truncate max-w-24 block", children: lead.assignedAgent.replace("GenAI Agent ", "") }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 hidden lg:table-cell", children: lead.region ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(RegionBadge, { region: lead.region }),
-                      lead.routedTo && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground truncate max-w-24 block", children: lead.routedTo.split(" ")[0] })
-                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: "—" }) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      "div",
-                      {
-                        className: "flex items-center justify-end gap-1",
-                        onClick: (e3) => e3.stopPropagation(),
-                        onKeyDown: (e3) => e3.stopPropagation(),
-                        children: [
+                        ) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(LeadStatusBadge, { status: effectiveStatus }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.source }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.channel }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 text-xs font-bold text-primary", children: (lead.clientContactPerson || lead.name).split(" ").map((n2) => n2[0]).join("").slice(0, 2) }),
                           /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            "button",
+                            "span",
                             {
-                              type: "button",
-                              title: `Call ${lead.name}`,
-                              onClick: () => {
-                                humanDialerStore.getState().setClickToCallTargetObj({
-                                  name: lead.name,
-                                  phone: lead.phone,
-                                  company: lead.company
-                                });
-                                navigate({ to: "/human-dialer" });
-                              },
-                              className: "p-1 rounded hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 transition-colors",
-                              "aria-label": `Call ${lead.name}`,
-                              "data-ocid": `call-lead-${lead.id}`,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3.5 h-3.5" })
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            "button",
-                            {
-                              type: "button",
-                              onClick: () => setDetailLead(lead),
-                              className: "p-1 rounded hover:bg-muted text-muted-foreground hover:text-primary transition-colors",
-                              "aria-label": "View lead",
-                              "data-ocid": `view-lead-${lead.id}`,
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-3.5 h-3.5" })
+                              className: "text-xs font-semibold text-foreground truncate max-w-28",
+                              title: lead.clientContactPerson || lead.name,
+                              children: lead.clientContactPerson || lead.name
                             }
                           )
-                        ]
-                      }
-                    ) })
-                  ]
-                },
-                lead.id
-              );
-            }),
-            paginated.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 11, className: "py-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-muted-foreground/40" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-muted-foreground", children: "No leads match your filters" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "button",
-                {
-                  type: "button",
-                  onClick: () => {
-                    setSearch("");
-                    setStatusFilter("all");
-                    setSourceFilter("all");
-                    setAgentFilter("all");
-                    setDateRange("all");
-                  },
-                  className: "text-xs text-primary hover:underline",
-                  "data-ocid": "clear-filters-btn",
-                  children: "Clear all filters"
-                }
-              )
-            ] }) }) })
-          ] })
-        ] }) }),
+                        ] }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          CellText,
+                          {
+                            value: lead.clientMobileNumber || lead.phone,
+                            mono: true
+                          }
+                        ) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: "text-xs text-foreground truncate block max-w-36",
+                            title: lead.clientEmailId || lead.email,
+                            children: lead.clientEmailId || lead.email
+                          }
+                        ) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: "text-xs text-foreground truncate block max-w-28",
+                            title: lead.clientCompanyName || lead.company,
+                            children: lead.clientCompanyName || lead.company
+                          }
+                        ) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.category }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.headOffice }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.requirements ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: "text-xs text-foreground truncate block max-w-36",
+                            title: lead.requirements,
+                            children: lead.requirements.length > 30 ? `${lead.requirements.slice(0, 30)}…` : lead.requirements
+                          }
+                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.duration }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.budget ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-foreground font-mono", children: [
+                          "₹",
+                          lead.budget.toLocaleString("en-IN")
+                        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.reportingManager }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.salesperson }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.remarks ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: "text-xs text-foreground truncate block max-w-36",
+                            title: lead.remarks,
+                            children: lead.remarks.length > 28 ? `${lead.remarks.slice(0, 28)}…` : lead.remarks
+                          }
+                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.detailsRequestedViaWhatsApp !== void 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: `text-xs font-medium ${lead.detailsRequestedViaWhatsApp ? "text-emerald-400" : "text-muted-foreground"}`,
+                            children: lead.detailsRequestedViaWhatsApp ? "Yes" : "No"
+                          }
+                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.enquiryForwardedThrough }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.typeOfInquiry }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.connectedStatus ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: `text-xs font-medium ${lead.connectedStatus === "Connected" ? "text-emerald-400" : lead.connectedStatus === "In Discussion" ? "text-amber-400" : "text-muted-foreground"}`,
+                            children: lead.connectedStatus
+                          }
+                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.stage ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: `text-xs font-medium px-1.5 py-0.5 rounded ${lead.stage === "Closed Won" ? "bg-emerald-500/15 text-emerald-400" : lead.stage === "Closed Lost" ? "bg-muted text-muted-foreground" : lead.stage === "Negotiation" ? "bg-amber-500/15 text-amber-400" : lead.stage === "Proposal Sent" ? "bg-blue-500/15 text-blue-400" : "bg-muted/50 text-foreground"}`,
+                            children: lead.stage
+                          }
+                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CellText, { value: lead.campaignLocation }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.region ? /* @__PURE__ */ jsxRuntimeExports.jsx(RegionBadge, { region: lead.region }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.ehRegion ? /* @__PURE__ */ jsxRuntimeExports.jsx(RegionBadge, { region: lead.ehRegion }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(TD, { children: lead.revenueDisplayAmount ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-foreground font-mono", children: [
+                          "₹",
+                          lead.revenueDisplayAmount.toLocaleString(
+                            "en-IN"
+                          )
+                        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground/40", children: "—" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-1.5 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "div",
+                          {
+                            className: "flex items-center justify-end gap-1",
+                            onClick: (e3) => e3.stopPropagation(),
+                            onKeyDown: (e3) => e3.stopPropagation(),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "button",
+                                {
+                                  type: "button",
+                                  title: `Call ${lead.clientContactPerson || lead.name}`,
+                                  onClick: () => {
+                                    humanDialerStore.getState().setClickToCallTargetObj({
+                                      name: lead.clientContactPerson || lead.name,
+                                      phone: lead.clientMobileNumber || lead.phone,
+                                      company: lead.clientCompanyName || lead.company
+                                    });
+                                    navigate({ to: "/human-dialer" });
+                                  },
+                                  className: "p-1 rounded hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 transition-colors",
+                                  "aria-label": `Call ${lead.name}`,
+                                  "data-ocid": `call-lead-${lead.id}`,
+                                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3.5 h-3.5" })
+                                }
+                              ),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "button",
+                                {
+                                  type: "button",
+                                  onClick: () => setDetailLead(lead),
+                                  className: "p-1 rounded hover:bg-muted text-muted-foreground hover:text-primary transition-colors",
+                                  "aria-label": "View lead",
+                                  "data-ocid": `view-lead-${lead.id}`,
+                                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-3.5 h-3.5" })
+                                }
+                              )
+                            ]
+                          }
+                        ) })
+                      ]
+                    },
+                    lead.id
+                  );
+                }),
+                paginated.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 26, className: "py-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-muted-foreground/40" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-muted-foreground", children: "No leads match your filters" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => {
+                        setSearch("");
+                        setStatusFilter("all");
+                        setSourceFilter("all");
+                        setAgentFilter("all");
+                        setDateRange("all");
+                      },
+                      className: "text-xs text-primary hover:underline",
+                      "data-ocid": "clear-filters-btn",
+                      children: "Clear all filters"
+                    }
+                  )
+                ] }) }) })
+              ] })
+            ]
+          }
+        ) }),
         totalPages > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {

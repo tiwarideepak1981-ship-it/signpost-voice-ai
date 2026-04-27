@@ -469,6 +469,138 @@ const leadStatuses: Lead["status"][] = [
   "lost",
 ];
 
+// ─── Custom field lookup arrays ───────────────────────────────────────────────
+const sources = [
+  "Inbound Call",
+  "Outbound Call",
+  "WhatsApp",
+  "Email",
+  "Referral",
+  "LinkedIn",
+  "Website",
+];
+const channels = ["Direct", "Agency", "Partner", "Digital", "Cold Call"];
+const categories = [
+  "Transit",
+  "Billboard",
+  "Airport",
+  "Mall",
+  "Cinema",
+  "Street Furniture",
+  "Digital OOH",
+];
+const headOffices = [
+  "Mumbai",
+  "Delhi",
+  "Bangalore",
+  "Chennai",
+  "Kolkata",
+  "Hyderabad",
+  "Pune",
+];
+const requirementsList = [
+  "10 screens in Mumbai metro stations for 2 weeks",
+  "Billboard placement on NH-48 corridor for 1 month",
+  "Airport digital screens at T2 terminal, all faces",
+  "Mall atrium takeover in Phoenix Palladium for 3 weeks",
+  "Transit media on BEST buses in Western Mumbai",
+  "Cinema lobby screens pre-movie slots across multiplex chain",
+  "Street furniture panels near IT parks in Bangalore",
+  "Digital OOH screens at major junctions in Delhi NCR",
+  "Premium billboard on Marine Drive facing sea",
+  "Bus shelter advertising in Pune city limits",
+  "Metro pillar branding for product launch campaign",
+  "Airport baggage belt branding for brand visibility",
+];
+const campaignDurations = [
+  "2 weeks",
+  "1 month",
+  "3 months",
+  "6 months",
+  "1 year",
+  "45 days",
+  "2 months",
+];
+const budgets = [
+  500000, 1000000, 2500000, 5000000, 10000000, 2000000, 750000, 1500000,
+  3000000, 800000,
+];
+const reportingManagers = [
+  "Anand Krishnamurthy",
+  "Sunita Reddy",
+  "Rajiv Malhotra",
+  "Preethi Nambiar",
+  "Sanjiv Kapoor",
+  "Meenakshi Iyer",
+  "Harsh Vardhan",
+];
+const salespersons = [
+  "Rohan Desai",
+  "Pooja Mehta",
+  "Kartik Sharma",
+  "Divya Nair",
+  "Arpit Joshi",
+  "Shreya Pillai",
+  "Aakash Singh",
+];
+const remarksList = [
+  "Interested in premium inventory. Needs rate card.",
+  "Visited office for demo. High-intent client.",
+  "Requesting case studies from similar industry.",
+  "Budget approved. Awaiting final brief.",
+  "Decision expected by end of month.",
+  "Needs approval from marketing head.",
+  "Very responsive. Strong potential.",
+  "Called twice. Follow-up scheduled.",
+  "Competition also pitching. Price-sensitive.",
+  "Confirmed interest. Proposal stage.",
+];
+const enquiryForwardedThroughOptions = [
+  "Direct",
+  "Partner",
+  "Agency",
+  "LinkedIn",
+  "Referral",
+  "Email Campaign",
+];
+const typeOfInquiryOptions = [
+  "New Campaign",
+  "Renewal",
+  "Expansion",
+  "Price Inquiry",
+  "Proposal Request",
+];
+const connectedStatusOptions = [
+  "Connected",
+  "Not Connected",
+  "Callback Requested",
+  "In Discussion",
+];
+const stageOptions = [
+  "New",
+  "Qualified",
+  "Proposal Sent",
+  "Negotiation",
+  "Closed Won",
+  "Closed Lost",
+];
+const campaignLocationsList = [
+  "Mumbai",
+  "Delhi NCR",
+  "Bangalore",
+  "Chennai",
+  "Kolkata",
+  "Hyderabad",
+  "Pune",
+  "Ahmedabad",
+  "Jaipur",
+  "Lucknow",
+];
+const revenueAmounts = [
+  850000, 1200000, 4500000, 2800000, 650000, 1800000, 3200000, 900000, 5500000,
+  1100000, 750000, 2200000, 4000000, 1600000, 700000,
+];
+
 export const leads: Lead[] = Array.from({ length: 85 }, (_, i) => {
   const fn = firstNames[i % firstNames.length];
   const ln = lastNames[i % lastNames.length];
@@ -486,11 +618,14 @@ export const leads: Lead[] = Array.from({ length: 85 }, (_, i) => {
   const role = leadRoles[i % leadRoles.length];
   const company = companies[i % companies.length];
   const location = locations[i % locations.length];
+  const contactName = `${fn} ${ln}`;
+  const contactPhone = `+91-9${String(800000000 + i * 1234).slice(0, 9)}`;
+  const contactEmail = `${fn.toLowerCase()}.${ln.toLowerCase()}@${company.toLowerCase().replace(/[\s&]/g, "").replace(/\./g, "")}.com`;
   const partialLead = {
     id: `lead-${i + 1}`,
-    name: `${fn} ${ln}`,
-    phone: `+91-9${String(800000000 + i * 1234).slice(0, 9)}`,
-    email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${company.toLowerCase().replace(/[\s&]/g, "").replace(/\./g, "")}.com`,
+    name: contactName,
+    phone: contactPhone,
+    email: contactEmail,
     company,
     status: leadStatuses[statusIdx],
     intent: intents[i % intents.length],
@@ -507,6 +642,29 @@ export const leads: Lead[] = Array.from({ length: 85 }, (_, i) => {
           : "Needs follow-up on campaign brief",
     callCount: 1 + (i % 6),
     location,
+    // ─── 23 custom form fields ──────────────────────────────────────────────
+    source: sources[i % sources.length],
+    channel: channels[i % channels.length],
+    clientContactPerson: contactName,
+    clientMobileNumber: contactPhone,
+    clientEmailId: contactEmail,
+    clientCompanyName: company,
+    category: categories[i % categories.length],
+    headOffice: headOffices[i % headOffices.length],
+    requirements: requirementsList[i % requirementsList.length],
+    duration: campaignDurations[i % campaignDurations.length],
+    budget: budgets[i % budgets.length],
+    reportingManager: reportingManagers[i % reportingManagers.length],
+    salesperson: salespersons[i % salespersons.length],
+    remarks: remarksList[i % remarksList.length],
+    detailsRequestedViaWhatsApp: i % 3 === 0,
+    enquiryForwardedThrough:
+      enquiryForwardedThroughOptions[i % enquiryForwardedThroughOptions.length],
+    typeOfInquiry: typeOfInquiryOptions[i % typeOfInquiryOptions.length],
+    connectedStatus: connectedStatusOptions[i % connectedStatusOptions.length],
+    stage: stageOptions[i % stageOptions.length],
+    campaignLocation: campaignLocationsList[i % campaignLocationsList.length],
+    revenueDisplayAmount: revenueAmounts[i % revenueAmounts.length],
   };
   const region = detectRegion(partialLead);
   const headNames: Record<string, string> = {
@@ -521,9 +679,51 @@ export const leads: Lead[] = Array.from({ length: 85 }, (_, i) => {
   return {
     ...partialLead,
     region,
+    ehRegion: region,
     routedTo: headNames[region] ?? "Vikram Mehta",
     routedAt: "2025-01-10T09:00:00Z",
     routingStatus: "sent" as const,
+    comments:
+      i === 0
+        ? [
+            {
+              id: "cmt-1-2",
+              text: "Client requested revised proposal — will send by EOD.",
+              timestamp: "2024-04-15T14:30:00Z",
+              author: "Agent",
+            },
+            {
+              id: "cmt-1-1",
+              text: "Connected on WhatsApp — shared media kit.",
+              timestamp: "2024-04-12T11:00:00Z",
+              author: "Agent",
+            },
+          ]
+        : i === 2
+          ? [
+              {
+                id: "cmt-3-1",
+                text: "Sent campaign proposal via email, awaiting response.",
+                timestamp: "2024-04-10T09:45:00Z",
+                author: "Agent",
+              },
+            ]
+          : i === 4
+            ? [
+                {
+                  id: "cmt-5-2",
+                  text: "Meeting scheduled for next week.",
+                  timestamp: "2024-04-14T16:00:00Z",
+                  author: "Agent",
+                },
+                {
+                  id: "cmt-5-1",
+                  text: "Follow-up call made — no response, left voicemail.",
+                  timestamp: "2024-04-09T10:30:00Z",
+                  author: "Agent",
+                },
+              ]
+            : undefined,
   };
 });
 
